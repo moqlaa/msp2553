@@ -92,6 +92,7 @@ void interpreteur( void )
         envoi_msg_UART((unsigned char *)cmd);
         envoi_msg_UART("->");
         Send_char_SPI(0x30); // Send '0' over SPI to Slave
+        P1OUT &= ~BIT0; //turn off LED
         envoi_msg_UART("\r\n");
     }
     else if (strcmp((const char *)cmd, "1") == 0)
@@ -100,6 +101,7 @@ void interpreteur( void )
         envoi_msg_UART((unsigned char *)cmd);
         envoi_msg_UART("->");
         Send_char_SPI(0x31); // Send '1' over SPI to Slave
+        P1OUT |= BIT0; //turn on LED
         envoi_msg_UART("\r\n");
     }
     else if (strcmp((const char *)cmd, "ver") == 0)

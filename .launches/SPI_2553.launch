@@ -4,7 +4,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROGRAM.MSP430G2553.ccxml.TI MSP430 USB1/MSP430" value="${build_artifact:SPI_2553}"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.MSP430G2553.ccxml.TI MSP430 USB1/MSP430" value="SPI_2553"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:SPI_2553}"/>
-<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.MSP430G2553.ccxml.TI MSP430 USB1/MSP430" value="C:\Users\Alexis\SPI_2553\Debug\SPI_2553.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.MSP430G2553.ccxml.TI MSP430 USB1/MSP430" value="C:\Users\Alexis\Documents\Workspace_CCS\SPI_2553\Debug\SPI_2553.out"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/SPI_2553"/>
 </listAttribute>
