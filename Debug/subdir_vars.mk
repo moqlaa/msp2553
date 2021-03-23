@@ -9,21 +9,39 @@ CMD_SRCS += \
 ../lnk_msp430g2553.cmd 
 
 C_SRCS += \
-../main.c 
+../SPI.c \
+../UART.c \
+../main.c \
+../move.c 
 
 C_DEPS += \
-./main.d 
+./SPI.d \
+./UART.d \
+./main.d \
+./move.d 
 
 OBJS += \
-./main.obj 
+./SPI.obj \
+./UART.obj \
+./main.obj \
+./move.obj 
 
 OBJS__QUOTED += \
-"main.obj" 
+"SPI.obj" \
+"UART.obj" \
+"main.obj" \
+"move.obj" 
 
 C_DEPS__QUOTED += \
-"main.d" 
+"SPI.d" \
+"UART.d" \
+"main.d" \
+"move.d" 
 
 C_SRCS__QUOTED += \
-"../main.c" 
+"../SPI.c" \
+"../UART.c" \
+"../main.c" \
+"../move.c" 
 
 
