@@ -42,7 +42,7 @@ unsigned char intcmd = FALSE;   // call interpreteur()
 
 /*
  * Prototypes
- */
+ *//*
 void init_BOARD( void );
 void init_UART( void );
 void init_USCI( void );
@@ -50,9 +50,11 @@ void interpreteur( void );
 void envoi_msg_UART(unsigned char * );
 void Send_char_SPI( unsigned char );
 
-void init_pwm(void);
-void arretRobot(void);
+void init_move (void);
 void avancer(void);
+void arretRobot(void);
+void tournerDroite();
+void tournerGauche();*/
 
 
 /* ----------------------------------------------------------------------------
@@ -101,6 +103,7 @@ void main( void )
     init_BOARD();
     init_UART();
     init_USCI();
+    init_move();
 
     envoi_msg_UART("\rReady !\r\n"); // user prompt
     envoi_msg_UART(PROMPT);        //---------------------------- command prompt
