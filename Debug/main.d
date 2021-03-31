@@ -14,6 +14,7 @@ main.obj: C:/Users/Alexis/Documents/Workspace_CCS/SPI_2553/UART.h
 main.obj: C:/Users/Alexis/Documents/Workspace_CCS/SPI_2553/SPI.h
 main.obj: C:/Users/Alexis/Documents/Workspace_CCS/SPI_2553/move.h
 main.obj: C:/Users/Alexis/Documents/Workspace_CCS/SPI_2553/define.h
+main.obj: C:/Users/Alexis/Documents/Workspace_CCS/SPI_2553/ADC.h
 
 ../main.c: 
 C:/ti/ccs1020/ccs/ccs_base/msp430/include/msp430.h: 
@@ -29,3 +30,4 @@ C:/Users/Alexis/Documents/Workspace_CCS/SPI_2553/UART.h:
 C:/Users/Alexis/Documents/Workspace_CCS/SPI_2553/SPI.h: 
 C:/Users/Alexis/Documents/Workspace_CCS/SPI_2553/move.h: 
 C:/Users/Alexis/Documents/Workspace_CCS/SPI_2553/define.h: 
+C:/Users/Alexis/Documents/Workspace_CCS/SPI_2553/ADC.h: 

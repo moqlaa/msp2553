@@ -1,1 +1,1 @@
-"./SPI.obj" "./UART.obj" "./main.obj" "./move.obj" "../lnk_msp430g2553.cmd" -llibc.a 
+"./ADC.obj" "./SPI.obj" "./UART.obj" "./main.obj" "./move.obj" "../lnk_msp430g2553.cmd" -llibc.a 

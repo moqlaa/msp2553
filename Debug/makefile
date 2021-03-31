@@ -10,6 +10,7 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./ADC.obj" \
 "./SPI.obj" \
 "./UART.obj" \
 "./main.obj" \
@@ -157,8 +158,8 @@ SPI_2553.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "SPI.obj" "UART.obj" "main.obj" "move.obj" 
-	-$(RM) "SPI.d" "UART.d" "main.d" "move.d" 
+	-$(RM) "ADC.obj" "SPI.obj" "UART.obj" "main.obj" "move.obj" 
+	-$(RM) "ADC.d" "SPI.d" "UART.d" "main.d" "move.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

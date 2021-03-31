@@ -6,7 +6,6 @@
  *
  * M S P 4 3 0  G 2 5 5 3   -   SPI/MASTER 3 Wires
  *
- * (c)-Yann DUCHEMIN / ESIGELEC - r.III162018 for CCS
  * --------------------------------------------------------------
  *
  * La carte Launchpad est raccordée en SPI via l'USI B0
@@ -14,13 +13,20 @@
  * SIMO : P1.7 / UCB0SIMO, master OUT
  * MOSI : P1.6 / UCB0SOMI, master IN
  *
- * A la reception du caractère 1 sur l'UART,
- *  le caractère est transmis sur le bus SPI,
- *  et affiché en echo sur l'UART
  *
- * A la reception du caractère 0 sur l'UART,
- *  le caractère est transmis sur le bus SPI,
- *  et affiché en echo sur l'UART
+ *                                   MSP430G2553
+ *                                -----------------
+ *                             -|VCC           GND|-
+ *                  IR Sensor ->|P1.0          XIN|-
+ *             Data In (UART) ->|P1.1         XOUT|-
+ *            Data OUT (UART) <-|P1.2         TEST|-
+ *                            <-|P1.3          RST|->
+ *                            <-|P1.4         P1.7|-> SPI Data Out
+ *                        SPI <-|P1.5         P1.6|<- SPI Data In
+ *                            ->|P2.0         P2.5|->
+ *                            <-|P2.1         P2.4|-> PWM Motor B
+ *                PWM Motor A <-|P2.2         P2.3|<-
+ *
  *
  */
 
@@ -30,31 +36,16 @@
 #include <SPI.h>
 #include <move.h>
 #include <define.h>
+#include <ADC.h>
 
 /*
  * Variables globales
  */
-// static const char spi_in = 0x37;
-unsigned char cmd[CMDLEN];      // tableau de caracteres lie a la commande user
-unsigned char car = 0x30;       // 0
+/*static const char spi_in = 0x37*/
+unsigned char cmd[CMDLEN]; /*tableau de caracteres lie a la commande user*/
+unsigned char car = 0x30; /*0*/
 unsigned int  nb_car = 0;
-unsigned char intcmd = FALSE;   // call interpreteur()
-
-/*
- * Prototypes
- *//*
-void init_BOARD( void );
-void init_UART( void );
-void init_USCI( void );
-void interpreteur( void );
-void envoi_msg_UART(unsigned char * );
-void Send_char_SPI( unsigned char );
-
-void init_move (void);
-void avancer(void);
-void arretRobot(void);
-void tournerDroite();
-void tournerGauche();*/
+unsigned char intcmd = FALSE; /*call interpreteur()*/
 
 
 /* ----------------------------------------------------------------------------
@@ -64,7 +55,7 @@ void tournerGauche();*/
  */
 void init_BOARD( void )
 {
-    // Stop watchdog timer to prevent time out reset
+    /*Stop watchdog timer to prevent time out reset*/
     WDTCTL = WDTPW | WDTHOLD;
 
     if( (CALBC1_1MHZ==0xFF) || (CALDCO_1MHZ==0xFF) )
@@ -73,20 +64,11 @@ void init_BOARD( void )
     }
     else
     {
-        // Factory Set.
+        /*Factory Set*/
         DCOCTL = 0;
         BCSCTL1 = CALBC1_1MHZ;
         DCOCTL = (0 | CALDCO_1MHZ);
     }
-
-    /*/--------------- Secure mode
-    P1SEL  = 0x00;        // GPIO
-    P1SEL2 = 0x00;        // GPIO
-    P2SEL  = 0x00;        // GPIO
-    P2SEL2 = 0x00;        // GPIO
-    P1DIR = 0x00;         // IN
-    P2DIR = 0x00;         // IN
-*/
 
     P1SEL  &= ~LED_R;
     P1SEL2 &= ~LED_R;
@@ -95,7 +77,7 @@ void init_BOARD( void )
 }
 
 
-/* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/*
  * main.c
  */
 void main( void )
@@ -104,21 +86,22 @@ void main( void )
     init_UART();
     init_USCI();
     init_move();
+    ADC_init();
 
-    envoi_msg_UART("\rReady !\r\n"); // user prompt
-    envoi_msg_UART(PROMPT);        //---------------------------- command prompt
+    envoi_msg_UART("\rReady !\r\n"); /*user prompt*/
+    envoi_msg_UART(PROMPT); /*command prompt*/
 
  while(1)
     {
         if( intcmd )
         {
-            while ((UCB0STAT & UCBUSY));   // attend que USCI_SPI soit dispo.
-            interpreteur();         // execute la commande utilisateur
-            intcmd = FALSE;         // acquitte la commande en cours
+            while ((UCB0STAT & UCBUSY)); /*attend que USCI_SPI soit dispo*/
+            interpreteur(); /*execute la commande utilisateur*/
+            intcmd = FALSE; /*acquitte la commande en cours*/
         }
         else
         {
-            __bis_SR_register(LPM4_bits | GIE); // general interrupts enable & Low Power Mode
+            __bis_SR_register(LPM4_bits | GIE); /*general interrupts enable & Low Power Mode*/
         }
     }
 }
@@ -131,13 +114,13 @@ void main( void )
 #pragma vector = USCIAB0RX_VECTOR
 __interrupt void USCIAB0RX_ISR()
 {
-    //---------------- UART
+    /*UART*/
     if (IFG2 & UCA0RXIFG)
     {
         while(!(IFG2 & UCA0RXIFG));
-        cmd[nb_car]=UCA0RXBUF;         // lecture caractère reçu
+        cmd[nb_car]=UCA0RXBUF; /*lecture caractère reçu*/
 
-        while(!(IFG2 & UCA0TXIFG));    // attente de fin du dernier envoi (UCA0TXIFG à 1 quand UCA0TXBUF vide) / echo
+        while(!(IFG2 & UCA0TXIFG)); /*attente de fin du dernier envoi (UCA0TXIFG à 1 quand UCA0TXBUF vide) / echo*/
         UCA0TXBUF = cmd[nb_car];
 
         if( cmd[nb_car] == ESC)
@@ -152,7 +135,7 @@ __interrupt void USCIAB0RX_ISR()
             cmd[nb_car] = 0x00;
             intcmd = TRUE;
             nb_car = 0;
-            __bic_SR_register_on_exit(LPM4_bits);   // OP mode !
+            __bic_SR_register_on_exit(LPM4_bits); /*OP mode !*/
         }
         else if( (nb_car < CMDLEN) && !((cmd[nb_car] == BSPC) || (cmd[nb_car] == DEL)) )
         {
@@ -165,7 +148,7 @@ __interrupt void USCIAB0RX_ISR()
         }
     }
 
-    //--------------- SPI
+    /*SPI*/
     else if (IFG2 & UCB0RXIFG)
     {
         while( (UCB0STAT & UCBUSY) && !(UCB0STAT & UCOE) );
@@ -175,4 +158,4 @@ __interrupt void USCIAB0RX_ISR()
         P1OUT ^= LED_R;
     }
 }
-//------------------------------------------------------------------ End ISR
+/*End ISR*/
