@@ -38,14 +38,17 @@
 #include <define.h>
 #include <ADC.h>
 
+typedef unsigned char UCHAR;
+typedef unsigned int UINT_32;
+
 /*
  * Variables globales
  */
 /*static const char spi_in = 0x37*/
-unsigned char cmd[CMDLEN]; /*tableau de caracteres lie a la commande user*/
-unsigned char car = 0x30; /*0*/
-unsigned int  nb_car = 0;
-unsigned char intcmd = FALSE; /*call interpreteur()*/
+UCHAR cmd[CMDLEN]; /*tableau de caracteres lie a la commande user*/
+UCHAR car = 0x30; /*0*/
+UINT_32  nb_car = 0;
+UCHAR intcmd = FALSE; /*call interpreteur()*/
 
 
 /* ----------------------------------------------------------------------------
@@ -72,16 +75,20 @@ void init_BOARD( void )
 
     P1SEL  &= ~LED_R;
     P1SEL2 &= ~LED_R;
-    P1DIR |= LED_R ;  // LED: output
+    P1DIR |= LED_R ;  /* LED: output */
     P1OUT &= ~LED_R ;
 }
 
 
 /*
- * main.c
+ *
+ * main
+ *
+ *
  */
-void main( void )
+int main( void )	/* principal function */
 {
+    /* initialization */
     init_BOARD();
     init_UART();
     init_USCI();
@@ -95,8 +102,10 @@ void main( void )
     {
         if( intcmd )
         {
-            while ((UCB0STAT & UCBUSY)); /*attend que USCI_SPI soit dispo*/
-            interpreteur(); /*execute la commande utilisateur*/
+            while ((UCB0STAT & UCBUSY)) /*attend que USCI_SPI soit dispo*/
+            {
+		}
+		interpreteur(); /*execute la commande utilisateur*/
             intcmd = FALSE; /*acquitte la commande en cours*/
         }
         else
@@ -106,35 +115,39 @@ void main( void )
     }
 }
 
-// --------------------------- R O U T I N E S   D ' I N T E R R U P T I O N S
-
+/* ------------------------- R O U T I N E S   D ' I N T E R R U P T I O N S */
 /* ************************************************************************* */
 /* VECTEUR INTERRUPTION USCI RX                                              */
 /* ************************************************************************* */
+/* ------------------------------------------------------------------------- */
 #pragma vector = USCIAB0RX_VECTOR
-__interrupt void USCIAB0RX_ISR()
+__interrupt void USCIAB0RX_ISR(void)
 {
     /*UART*/
     if (IFG2 & UCA0RXIFG)
     {
-        while(!(IFG2 & UCA0RXIFG));
+        while(!(IFG2 & UCA0RXIFG))
+	  {
+	  }
         cmd[nb_car]=UCA0RXBUF; /*lecture caractère reçu*/
 
-        while(!(IFG2 & UCA0TXIFG)); /*attente de fin du dernier envoi (UCA0TXIFG à 1 quand UCA0TXBUF vide) / echo*/
-        UCA0TXBUF = cmd[nb_car];
+        while(!(IFG2 & UCA0TXIFG)) /*attente de fin du dernier envoi (UCA0TXIFG à 1 quand UCA0TXBUF vide) / echo*/
+        {
+	  }
+	  UCA0TXBUF = cmd[nb_car];
 
         if( cmd[nb_car] == ESC)
         {
-            nb_car = 0;
-            cmd[1] = 0x00;
+            nb_car = 0U;
+            cmd[1] = 0x00U;
             cmd[0] = CR;
         }
 
         if( (cmd[nb_car] == CR) || (cmd[nb_car] == LF))
         {
-            cmd[nb_car] = 0x00;
+            cmd[nb_car] = 0x00U;
             intcmd = TRUE;
-            nb_car = 0;
+            nb_car = 0U;
             __bic_SR_register_on_exit(LPM4_bits); /*OP mode !*/
         }
         else if( (nb_car < CMDLEN) && !((cmd[nb_car] == BSPC) || (cmd[nb_car] == DEL)) )
@@ -143,7 +156,7 @@ __interrupt void USCIAB0RX_ISR()
         }
         else
         {
-            cmd[nb_car] = 0x00;
+            cmd[nb_car] = 0x00U;
             nb_car--;
         }
     }
@@ -151,11 +164,19 @@ __interrupt void USCIAB0RX_ISR()
     /*SPI*/
     else if (IFG2 & UCB0RXIFG)
     {
-        while( (UCB0STAT & UCBUSY) && !(UCB0STAT & UCOE) );
-        while(!(IFG2 & UCB0RXIFG));
+        while( (UCB0STAT & UCBUSY) && !(UCB0STAT & UCOE) )
+	  {
+	  }
+        while(!(IFG2 & UCB0RXIFG))
+	  {
+	  }
         cmd[0] = UCB0RXBUF;
-        cmd[1] = 0x00;
+        cmd[1] = 0x00U;
         P1OUT ^= LED_R;
+    }
+    else 
+    {
+    /* no action */
     }
 }
 /*End ISR*/
